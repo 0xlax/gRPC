@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 	"net"
+
+	"github.com/0xlax/gRPC/server/blockchain"
 )
 
 func main() {
@@ -12,12 +14,16 @@ func main() {
 		log.Fatalf("unable  listern on 8080 port: %v", error)
 	}
 	srv := grpc.NewServer()
-	proto.RegisterBlockchainServer(srv, &Server{})
+	proto.RegisterBlockchainServer(srv, &Server{
+		Blockchain: blockchain.NewBLockchain(),
+	})
 	srv.Serve(listener)
 
 }
 
-type Server struct{}
+type Server struct {
+	Blockchain *blockchain.Blockchain
+}
 
 func (s *Server) AddBlock(context.Context, *proto.AddBlockRequest) (*proto.AddBlockResponse, err) {
 	return new(proto.AddBlockResponse), nil
