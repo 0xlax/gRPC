@@ -25,11 +25,25 @@ type Server struct {
 	Blockchain *blockchain.Blockchain
 }
 
-func (s *Server) AddBlock(context.Context, *proto.AddBlockRequest) (*proto.AddBlockResponse, err) {
-	return new(proto.AddBlockResponse), nil
+func (s *Server) AddBlock(ctz context.Context, in *proto.AddBlockRequest) (*proto.AddBlockResponse, err) {
+	block := s.Blockchain.AddBlock(in.Data)
+
+	return &proto.AddBlockResponse{
+		Hash: block.Hash,
+
+	}, nil
 
 }
 
-func (s *Server) GetBlockchain(context.Context, *proto.GetBlockchainRequest) (*proto.GetBlockchainResponse, err) {
-	return new(proto.GetBlockchainResponse), nil
+func (s *Server) GetBlockchain(ctx context.Context, in *proto.GetBlockchainRequest) (*proto.GetBlockchainResponse, err) {
+	resp := new(proto.GetBlockchainResponse)
+	for _, b := range s.Blockchain.Blocks {
+		resp.Blocks = append(resp.Blocks, &proto.Block{
+			b.PrevBlockHash: b.PrevBlockHash
+			Hash: b.Hash,
+			Data: b.Hash,
+		})
+	}
+
+	return resp, nil
 }
